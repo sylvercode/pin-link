@@ -1,0 +1,23 @@
+{
+  "id": "sylvercode-pin-link",
+  "name": "sylvercode-pin-link",
+  "title": "Sylvercode Pin Link",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": [
+    "scripts/pin-link.js"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "styles": [
+    "styles/pin-link.css"
+  ]
+}
