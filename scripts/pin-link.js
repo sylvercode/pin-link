@@ -25,7 +25,7 @@ async function renderNoteConfig(app, html, data, label) {
         let newValue = await Dialog.prompt({
             content: `<input type="text" value="${oldValue}">`,
             callback: (html) => {
-                html.find('input').val()
+                return html.find('input').val();
             }
         });
 
