@@ -1,0 +1,50 @@
+{
+  "id": "sylvercode-pin-link",
+  "title": "Sylvercode Pin Link",
+  "description": "Make note pins as external link",
+  "version": "0.0.1",
+  "packs": [],
+  "system": [],
+  "dependencies": [],
+  "scripts": [],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Sylvercode",
+      "email": "sylver.dev@outlook.com",
+      "flags": {}
+    }
+  ],
+  "flags": {
+    "canUpload": true
+  },
+  "relationships": {
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.0.0.0",
+          "verified": "1.12.6.0"
+        }
+      }
+    ]
+  },
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "esmodules": [
+    "scripts/module.js"
+  ]
+}
+
