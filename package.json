@@ -1,0 +1,17 @@
+{
+  "name": "sylvercode-pin-link",
+  "version": "1.0.0",
+  "description": "Make note pins as external link",
+  "private": true,
+  "scripts": {
+    "build": "vite build --mode development",
+    "watch": "tsc && vite build --watch"
+  },
+  "devDependencies": {
+    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+    "rollup-plugin-copy": "^3.5.0",
+    "sass": "^1.89.2",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.4"
+  }
+}
