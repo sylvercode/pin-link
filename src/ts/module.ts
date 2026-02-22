@@ -23,7 +23,8 @@ Hooks.once("init", () => {
   for (const patch of ModuleHooks.LIBWRAPPER_PATCHS) {
     libWrapper.register(MODULE_ID, patch.target, patch.fn, patch.type, patch.options);
   }
+
+  CONFIG.debug.hooks = true;
 });
 
 HooksAttacher.attachHooks(ModuleHooks.HOOKS_DEFINITIONS_SET);
-

@@ -59,9 +59,7 @@ async function renderNoteConfig(
       }
     });
 
-    const LinkJournalId =
-      game.collections?.get("JournalEntry")
-        ?.search({ "query": "Link" })[0]?.id;
+    const LinkJournalId = getLinkJournalId();
     if (LinkJournalId) {
       (journalSelect as HTMLSelectElement).value = LinkJournalId;
     }
@@ -72,6 +70,11 @@ async function renderNoteConfig(
 
 function getFlags(note: NoteDocument) {
   return note?.flags['pin-link'] ?? {};
+}
+
+function getLinkJournalId(): string | null {
+  return game.collections?.get("JournalEntry")
+    ?.search({ "query": "Link" })[0]?.id ?? null;
 }
 
 function updateUI(flags: NoteFlags, html: HTMLElement) {
@@ -103,6 +106,44 @@ async function _onNoteCan(this: MouseInteractionManager, wrapped: LibWrapperBase
   return wrapped(...args);
 }
 
+async function _onPasteKey(this: NotesLayer, wrapped: LibWrapperBaseCallback, ...args: LibWrapperBaseCallbackArgs) {
+  if (this.clipboard.objects?.length || 0 > 0)
+    return wrapped(...args);
+
+  const clipboardText = await navigator.clipboard.readText();
+  if (!clipboardText)
+    return wrapped(...args);
+
+  const htmlAnchor = parseAnchor(clipboardText);
+  const note: NoteDocument.CreateData = {
+    entryId: getLinkJournalId(),
+    ...canvas?.mousePosition,
+    text: htmlAnchor?.text ?? clipboardText,
+    flags: {
+      'pin-link': {
+        link: htmlAnchor?.href
+      }
+    }
+  };
+  this._createPreview(note);
+  return wrapped(...args);
+}
+
+function parseAnchor(text: string): { text: string; href?: string } | null {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  const anchor = doc.querySelector('a');
+
+  if (anchor) {
+    return {
+      text: anchor.textContent ?? anchor.href,
+      href: anchor.href
+    };
+  }
+
+  return null;
+}
+
 export const HOOKS_DEFINITIONS: Iterable<HookDefinitions> = [{
   on: [
     {
@@ -122,5 +163,10 @@ export const LIBWRAPPER_PATCHS: Iterable<LibWrapperWrapperDefinitions> = [
     target: "foundry.canvas.placeables.Note.prototype._onUnclickLeft",
     fn: _onUnclickLeft,
     type: "MIXED"
-  }
+  },
+  {
+    target: "foundry.canvas.layers.NotesLayer.prototype._onPasteKey",
+    fn: _onPasteKey,
+    type: "MIXED"
+  },
 ];
