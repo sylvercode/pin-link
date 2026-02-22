@@ -1,7 +1,9 @@
 
 import { HookDefinitions } from 'fvtt-hook-attacher';
+import getToolOrderInsertionSequence from 'fvtt-hook-attacher/utils/get_tool_order_insertion_sequence';
 import { LibWrapperBaseCallback, LibWrapperBaseCallbackArgs, LibWrapperWrapperDefinitions } from 'fvtt-lib-wrapper-types';
 import ApplicationV2 from 'node_modules/fvtt-types/src/foundry/client/applications/api/application.mjs';
+import { UPPER_MODULE_ID } from '../constants';
 
 interface NoteFlags {
   link?: string;
@@ -107,12 +109,12 @@ async function _onNoteCan(this: MouseInteractionManager, wrapped: LibWrapperBase
 }
 
 async function _onPasteKey(this: NotesLayer, wrapped: LibWrapperBaseCallback, ...args: LibWrapperBaseCallbackArgs) {
-  if (this.clipboard.objects?.length || 0 > 0)
+  if (!isLinkPasteToolActive())
     return wrapped(...args);
 
   const clipboardText = await navigator.clipboard.readText();
   if (!clipboardText)
-    return wrapped(...args);
+    return;
 
   const htmlAnchor = parseAnchor(clipboardText);
   const note: NoteDocument.CreateData = {
@@ -126,7 +128,6 @@ async function _onPasteKey(this: NotesLayer, wrapped: LibWrapperBaseCallback, ..
     }
   };
   this._createPreview(note);
-  return wrapped(...args);
 }
 
 function parseAnchor(text: string): { text: string; href?: string } | null {
@@ -144,11 +145,59 @@ function parseAnchor(text: string): { text: string; href?: string } | null {
   return null;
 }
 
+/**
+ * Name of the note layer.
+ */
+const NOTES_LAYER_NAME = foundry.canvas.layers.NotesLayer.layerOptions.name;
+
+/**
+ * Names of tools before which the new tool should be inserted.
+ */
+const EXTRA_TOOL_NAMES = ["clear", "toggle"];
+
+const TOGGLE_LINK_PASTE_TOOL_NAME = "toggleLinkPaste";
+
+/**
+ * Hook callback to add the outdoor walls toggle tool to the scene controls.
+ * @param controls The scene controls object.
+ */
+function getSceneControlButtons(controls: Record<string, SceneControls.Control>): void {
+  if (game?.i18n == undefined)
+    throw new Error("i18n not initialized");
+
+  const NotesTools = controls[NOTES_LAYER_NAME].tools;
+
+  const getNextOrder = getToolOrderInsertionSequence(NotesTools, EXTRA_TOOL_NAMES);
+
+  const toggleLinkPaste = {
+    name: TOGGLE_LINK_PASTE_TOOL_NAME,
+    title: game.i18n.localize(`${UPPER_MODULE_ID}.SceneControl.${NOTES_LAYER_NAME}.${TOGGLE_LINK_PASTE_TOOL_NAME}.title`),
+    icon: "fas fa-link",
+    toggle: true,
+    active: false,
+    order: getNextOrder()
+  }
+
+  NotesTools[toggleLinkPaste.name] = toggleLinkPaste;
+}
+
+function isLinkPasteToolActive(): boolean {
+  const notesControls = ui.controls?.control;
+  if (notesControls?.name !== NOTES_LAYER_NAME)
+    return false;
+
+  return notesControls.tools[TOGGLE_LINK_PASTE_TOOL_NAME].active ?? false;
+}
+
 export const HOOKS_DEFINITIONS: Iterable<HookDefinitions> = [{
   on: [
     {
       name: "renderNoteConfig",
       callback: renderNoteConfig
+    },
+    {
+      name: "getSceneControlButtons" as any, // getSceneControlButtons types are missing in fvtt-types
+      callback: getSceneControlButtons as any
     }
   ]
 }];
