@@ -8,6 +8,9 @@
       "fvtt-hook-attacher": [
         "libs/fvtt-hook-attacher/index"
       ],
+      "fvtt-hook-attacher/*": [
+        "libs/fvtt-hook-attacher/*"
+      ],
     },
     "types": [
       "fvtt-types",

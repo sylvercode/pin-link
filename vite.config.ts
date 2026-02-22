@@ -12,7 +12,7 @@ console.log(process.env.VSCODE_INJECTION);
 export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
-      "fvtt-hook-attacher": path.resolve(process.cwd(), "libs/fvtt-hook-attacher/index.ts"),
+      "fvtt-hook-attacher": path.resolve(process.cwd(), "libs/fvtt-hook-attacher"),
     },
   },
   build: {
